@@ -3,9 +3,11 @@ package com.example.exerciciossb.controllers;
 import com.example.exerciciossb.model.entities.Produto;
 import com.example.exerciciossb.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.awt.print.Pageable;
 import java.util.Optional;
 
 @RestController
@@ -35,5 +37,20 @@ public class ProdutoController {
     public int deleteProd(@RequestParam int id){
         produtoReposit.deleteById(id);
         return id;
+    }
+
+    @PutMapping(path = "/{id}")
+    public Produto updateProd(@PathVariable int id,@RequestParam double preco){
+        Optional<Produto> prod = produtoReposit.findById(id);
+        Produto produto = prod.get();
+        produto.setPreco(preco);
+        produtoReposit.save(produto);
+        return produto;
+    }
+
+    @GetMapping(path="/pagina/{pagina}/{qtdPag}")
+    public Iterable<Produto> paginatedProd(@PathVariable int pagina,@PathVariable int qtdPag){
+        PageRequest page = PageRequest.of(pagina-1,qtdPag);
+        return produtoReposit.findAll(page);
     }
 }
